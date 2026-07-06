@@ -75,11 +75,29 @@ def main():
                         dosya_metni = f.read()
                         
                     import re
-                    yapisik_regex = re.compile(r"[a-zçğıöşü]{2,}[A-ZÇĞİÖŞÜ][a-zçğıöşü]{2,}")
+                    aranacak_kaliplar = [
+                        re.compile(r"[a-zçğıöşü]{2,}[A-ZÇĞİÖŞÜ][a-zçğıöşü]{2,}"), # Genel Kural: kararıTemyiz
+                        re.compile(r"\S{60,}"),                                    # Anormal Kural: 60+ harfli devasa boşluksuz blok
+                        re.compile(r"\d{4}numaras[ıi]", re.IGNORECASE),            # 2012numarası
+                        re.compile(r"mahkemesitarih[iı]", re.IGNORECASE),          # mahkemesitarihi
+                        re.compile(r"karar[ıi]temyiz", re.IGNORECASE),             # kararıtemyiz
+                        re.compile(r"vekil[iı]hukuk", re.IGNORECASE),              # vekiliHUKUK
+                        re.compile(r"direnilmi[şs]tir\.?[tT]emyiz", re.IGNORECASE),# direnilmiştir.Temyiz
+                        re.compile(r"\d{4,5}yarg[ıi]tay", re.IGNORECASE),          # 2004yargıtay
+                        re.compile(r"dairesimahkemesi", re.IGNORECASE),            # dairesimahkemesi
+                        re.compile(r"cezag[üu]n[üu]", re.IGNORECASE),              # cezagünü
+                        re.compile(r"ayrılıpuygulanmakta", re.IGNORECASE)
+                    ]
                     
-                    if "vekiliHUKUK" in dosya_metni or "MahkemesiRİHİ" in dosya_metni or "ayrılıpuygulanmakta" in dosya_metni or yapisik_regex.search(dosya_metni):
+                    hata_bulundu = False
+                    for kalip in aranacak_kaliplar:
+                        if kalip.search(dosya_metni):
+                            hata_bulundu = True
+                            break
+                            
+                    if hata_bulundu:
                         durum = "❌ HATALI"
-                        aciklama = "Kelime birleşmesi / İç içe geçmiş satır tespit edildi."
+                        aciklama = "Çoklu Kelime Birleşmesi / İç içe geçmiş satır tespit edildi."
                     elif len(dosya_metni.strip()) < 100:
                         durum = "❌ EKSİK"
                         aciklama = "Dosya içeriği boş veya çok kısa (Eksik paragraf)."
