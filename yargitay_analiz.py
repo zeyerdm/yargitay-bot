@@ -157,6 +157,11 @@ def main():
         )
         page = context.new_page()
         
+        # ULTRA HIZLANDIRMA: Gereksiz grafik, CSS ve fontları indirmeyi engelle
+        page.route("**/*", lambda route: route.abort() 
+                   if route.request.resource_type in ["image", "stylesheet", "media", "font"] 
+                   else route.continue_())
+        
         islenen_sayisi = 0
         for filepath in to_process:
             # Gece boyu çalışıp ertesi gün tam saat 16:00 olduğunda otomatik durması için ayarlandı
