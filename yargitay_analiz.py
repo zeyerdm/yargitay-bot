@@ -183,9 +183,11 @@ def main():
                     dosya_metni = f.read()
                     
                 # 3. Aşama: Akıllı Karşılaştırma (Hataları Bul)
-                if "vekiliHUKUK" in dosya_metni or "MahkemesiRİHİ" in dosya_metni or "ayrılıpuygulanmakta" in dosya_metni:
+                yapisik_regex = re.compile(r"[a-zçğıöşü]{2,}[A-ZÇĞİÖŞÜ][a-zçğıöşü]{2,}")
+                
+                if "vekiliHUKUK" in dosya_metni or "MahkemesiRİHİ" in dosya_metni or "ayrılıpuygulanmakta" in dosya_metni or yapisik_regex.search(dosya_metni):
                     durum = "❌ HATALI"
-                    aciklama = "Kelime birleşmesi / Satır kayması tespit edildi."
+                    aciklama = "Kelime birleşmesi / İç içe geçmiş satır tespit edildi."
                     print(f"   ---> 🚨 HATA BULUNDU: {aciklama}")
                 elif len(dosya_metni.strip()) < 100:
                     durum = "❌ EKSİK"
