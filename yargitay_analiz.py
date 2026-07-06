@@ -28,7 +28,7 @@ def save_islenenler(islenenler):
     with open(ISLENENLER_DOSYASI, 'w', encoding='utf-8') as f:
         json.dump(islenenler, f, ensure_ascii=False, indent=4)
 
-def append_to_reports(dosya_adi, esas, karar, durum, aciklama):
+def append_to_reports(dosya_adi, esas, karar, durum, aciklama, filepath=None):
     # Ana CSV Kayıt (Excel'de kolay filtreleme için)
     file_exists = os.path.isfile(CSV_RAPOR)
     with open(CSV_RAPOR, 'a', newline='', encoding='utf-8') as f:
@@ -37,7 +37,7 @@ def append_to_reports(dosya_adi, esas, karar, durum, aciklama):
             writer.writerow(['Dosya Adı', 'Karar Künyesi (Esas/Karar)', 'Durum', 'Tespit Edilen Hata'])
         writer.writerow([dosya_adi, f"{esas} E. - {karar} K.", durum, aciklama])
         
-    # Sadece Hatalı Olanları Özel CSV'ye Kaydet (Yöneticiniz için)
+    # Sadece Hatalı Olanları Özel CSV'ye Kaydet
     if durum != "TEMİZ":
         hatali_exists = os.path.isfile(HATALI_CSV)
         with open(HATALI_CSV, 'a', newline='', encoding='utf-8') as f:
@@ -91,18 +91,31 @@ def search_yargitay(page, esas, karar):
         
         # Sorgula Butonu
         page.click("#detaylıAramaG")
+        time.sleep(2) # Yüklenmesi için bekle
         
         # Sonuç tablosunu ve metni bekle
-        page.wait_for_selector("table", timeout=10000)
+        page.wait_for_selector("table tbody tr", timeout=10000)
         
         try:
             # İlk sonuca tıkla (Tablodaki ilk satıra tıkla)
             page.locator("table tbody tr").first.click(timeout=5000)
+            time.sleep(3) # Karar metninin AJAX ile gelmesini bekle
+            
             page.wait_for_selector("div.card-scroll", timeout=10000)
             text = page.locator("div.card-scroll").inner_text()
+            
+            # Eğer metin boş geldiyse biraz daha bekle
+            if not text.strip():
+                time.sleep(3)
+                text = page.locator("div.card-scroll").inner_text()
+                
+            if not text.strip():
+                print("   ---> ⚠️ UYARI: Karar metni penceresi açıldı ama içi boş geldi!")
+                return None
+                
             return text
-        except:
-            print("Sonuç tablosunda eşleşme bulunamadı veya karar metni yüklenemedi.")
+        except Exception as ex:
+            print(f"   ---> ⚠️ UYARI: Tablodan sonuç seçilemedi veya metin okunamadı: {ex}")
             return None
             
     except Exception as e:
@@ -159,11 +172,11 @@ def main():
             esas, karar = extract_numbers(filename)
             
             if not esas or not karar:
-                append_to_reports(filename, "Bilinmiyor", "Bilinmiyor", "❌ HATALI", "Dosya isminden Esas/Karar numarası ayıklanamadı.")
+                append_to_reports(filename, "Bilinmiyor", "Bilinmiyor", "❌ HATALI", "Dosya isminden Esas/Karar numarası ayıklanamadı.", filepath)
                 islenenler.append(filepath)
                 continue
                 
-            print(f"[{islenen_sayisi+1}/{len(to_process)}] Sorgulanıyor: {esas} E. - {karar} K.")
+            print(f"[{islenen_sayisi+1}/{len(to_process)}] Sorgulanıyor: {filename} ({esas} E. - {karar} K.)")
             
             # 1. Aşama: Yargıtay'dan orijinal metni çek
             orijinal_metin = search_yargitay(page, esas, karar)
@@ -182,14 +195,18 @@ def main():
                     durum = "❌ EKSİK"
                     aciklama = "Dosya içeriği boş veya çok kısa (Eksik paragraf)."
                     print(f"   ---> 🚨 HATA BULUNDU: {aciklama}")
+                elif abs(len(orijinal_metin) - len(dosya_metni)) > 2000:
+                    durum = "❌ EKSİK / FAZLA"
+                    aciklama = f"Orijinal sitedeki metin ile dosya uzunluğu ciddi oranda uyuşmuyor. Fark: {abs(len(orijinal_metin) - len(dosya_metni))} karakter."
+                    print(f"   ---> 🚨 HATA BULUNDU: {aciklama}")
                 else:
                     durum = "TEMİZ"
                     aciklama = "Resmi siteyle birebir uyuşmaktadır. Sorun yok."
                     print(f"   ---> ✅ TEMİZ: Sorun yok.")
                     
-                append_to_reports(filename, esas, karar, durum, aciklama)
+                append_to_reports(filename, esas, karar, durum, aciklama, filepath)
             else:
-                append_to_reports(filename, esas, karar, "⚠️ UYARI", "Siteden yanıt alınamadı, zaman aşımı.")
+                append_to_reports(filename, esas, karar, "⚠️ UYARI", "Siteden yanıt alınamadı, zaman aşımı.", filepath)
                 print("   ---> ⚠️ UYARI: Siteden yanıt alınamadı. Kısa süreliğine duraklatılıyor...")
                 time.sleep(30) # Engel yememek için ceza beklemesi
                 

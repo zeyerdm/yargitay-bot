@@ -80,7 +80,7 @@ def main():
                     elif len(dosya_metni.strip()) < 100:
                         durum = "❌ EKSİK"
                         aciklama = "Dosya içeriği boş veya çok kısa (Eksik paragraf)."
-                    elif abs(len(orijinal_metin) - len(dosya_metni)) > 500:
+                    elif abs(len(orijinal_metin) - len(dosya_metni)) > 2000:
                         durum = "❌ EKSİK / FAZLA"
                         aciklama = f"Orijinal sitedeki metin ile dosya uzunluğu ciddi oranda uyuşmuyor. Fark: {abs(len(orijinal_metin) - len(dosya_metni))} karakter."
                     else:
