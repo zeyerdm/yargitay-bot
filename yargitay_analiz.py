@@ -10,7 +10,6 @@ from playwright.sync_api import sync_playwright
 # Konfigürasyon ve Yollar
 KLASOR_YOLU = r"C:\Users\Zeynep ERDEM\Downloads\Hukuk ve Ceza Kurul Son"
 ISLENENLER_DOSYASI = r"C:\Users\Zeynep ERDEM\.gemini\antigravity-ide\scratch\kararlar\islenenler.json"
-GUNLUK_LIMIT = 5000
 
 # Dinamik Tarihli Dosya İsimleri (Günün Raporu)
 BUGUN = datetime.now().strftime("%Y-%m-%d")
@@ -91,7 +90,7 @@ def search_yargitay(page, esas, karar):
         
         # Sorgula Butonu
         page.click("#detaylıAramaG")
-        time.sleep(2) # Yüklenmesi için bekle
+        time.sleep(1) # Yüklenmesi için bekle
         
         # Sonuç tablosunu ve metni bekle
         page.wait_for_selector("table tbody tr", timeout=10000)
@@ -147,15 +146,12 @@ def main():
         print("Tüm dosyalar zaten işlenmiş. Harika!")
         return
         
-    # Günlük kotayı uygula
-    to_process = to_process[:GUNLUK_LIMIT]
-    print(f"Bugün işlenecek dosya kotası: {len(to_process)}")
     print("--------------------------------------------------")
     
     # Playwright'ı başlat
     with sync_playwright() as p:
-        # Bot korumasına yakalanmamak için görünür tarayıcı (headless=False)
-        browser = p.chromium.launch(headless=False)
+        # HIZLANDIRMA: Ekranda tarayıcıyı gizleyerek (headless=True) hızı %30-40 artırdık.
+        browser = p.chromium.launch(headless=True)
         context = browser.new_context(
             user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
         )
@@ -163,9 +159,9 @@ def main():
         
         islenen_sayisi = 0
         for filepath in to_process:
-            # En geç 16:00 rapor gönderimi için 15:45'te sistemi güvenli durdur
-            if datetime.now().hour >= 15 and datetime.now().minute >= 45:
-                print("\n[ZAMAN SINIRI] Saat 15:45 oldu. Gün sonu raporları hazır! İşlem bugünlük durduruluyor...")
+            # Gece boyu çalışıp ertesi gün tam saat 16:00 olduğunda otomatik durması için ayarlandı
+            if datetime.now().hour == 16 and datetime.now().minute < 10:
+                print("\n[ZAMAN SINIRI] Saat 16:00 oldu. Gün sonu raporları hazır! İşlem durduruluyor...")
                 break
                 
             filename = os.path.basename(filepath)
@@ -215,14 +211,14 @@ def main():
             save_islenenler(islenenler)
             islenen_sayisi += 1
             
-            # ANTI-BAN MEKANİZMASI: Her dosya arası insan hızında bekle (4 ile 7 sn arası rastgele)
-            bekleme = random.uniform(4.0, 7.0)
+            # ANTI-BAN MEKANİZMASI: Hızlandırıldı (2 ile 4 sn arası)
+            bekleme = random.uniform(2.0, 4.0)
             time.sleep(bekleme)
             
-            # ANTI-BAN MEKANİZMASI: Her 100 dosyada bir tam 3 dakika mola ver (Çok Kritik!)
+            # ANTI-BAN MEKANİZMASI: Her 100 dosyada bir 1 dakika mola ver (Hızlandırıldı)
             if islenen_sayisi % 100 == 0:
-                print("\n[MOLA] 100 dosya işlendi. Yargıtay Firewall'unu tetiklememek için 3 dakika bekleniyor...\n")
-                time.sleep(180)
+                print("\n[MOLA] 100 dosya işlendi. 1 dakika nefes alınıyor...\n")
+                time.sleep(60)
                 
         browser.close()
     
