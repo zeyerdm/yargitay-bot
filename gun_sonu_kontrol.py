@@ -80,12 +80,17 @@ def main():
                     elif len(dosya_metni.strip()) < 100:
                         durum = "❌ EKSİK"
                         aciklama = "Dosya içeriği boş veya çok kısa (Eksik paragraf)."
-                    elif abs(len(orijinal_metin) - len(dosya_metni)) > 2000:
-                        durum = "❌ EKSİK / FAZLA"
-                        aciklama = f"Orijinal sitedeki metin ile dosya uzunluğu ciddi oranda uyuşmuyor. Fark: {abs(len(orijinal_metin) - len(dosya_metni))} karakter."
                     else:
-                        durum = "TEMİZ"
-                        aciklama = "Resmi siteyle birebir uyuşmaktadır. Sorun yok."
+                        orijinal_saf = "".join(orijinal_metin.split())
+                        dosya_saf = "".join(dosya_metni.split())
+                        fark = abs(len(orijinal_saf) - len(dosya_saf))
+                        
+                        if fark > 2000:
+                            durum = "❌ EKSİK / FAZLA"
+                            aciklama = f"Orijinal site ile dosya arasında saf harf sayısı uyuşmuyor. Fark: {fark} harf."
+                        else:
+                            durum = "TEMİZ"
+                            aciklama = "Resmi siteyle birebir uyuşmaktadır. Sorun yok."
                         
                     # Satırı güncelle
                     rows[index] = [dosya_adi, f"{esas} E. - {karar} K.", durum, aciklama]

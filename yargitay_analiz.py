@@ -191,14 +191,20 @@ def main():
                     durum = "❌ EKSİK"
                     aciklama = "Dosya içeriği boş veya çok kısa (Eksik paragraf)."
                     print(f"   ---> 🚨 HATA BULUNDU: {aciklama}")
-                elif abs(len(orijinal_metin) - len(dosya_metni)) > 2000:
-                    durum = "❌ EKSİK / FAZLA"
-                    aciklama = f"Orijinal sitedeki metin ile dosya uzunluğu ciddi oranda uyuşmuyor. Fark: {abs(len(orijinal_metin) - len(dosya_metni))} karakter."
-                    print(f"   ---> 🚨 HATA BULUNDU: {aciklama}")
                 else:
-                    durum = "TEMİZ"
-                    aciklama = "Resmi siteyle birebir uyuşmaktadır. Sorun yok."
-                    print(f"   ---> ✅ TEMİZ: Sorun yok.")
+                    # HOCANIN UYARISI: Boşlukları ve Enter'ları (Space, \n, \t) tamamen silip sadece harfleri say!
+                    orijinal_saf = "".join(orijinal_metin.split())
+                    dosya_saf = "".join(dosya_metni.split())
+                    fark = abs(len(orijinal_saf) - len(dosya_saf))
+                    
+                    if fark > 2000:
+                        durum = "❌ EKSİK / FAZLA"
+                        aciklama = f"Orijinal site ile dosya arasında saf harf sayısı uyuşmuyor. Fark: {fark} harf."
+                        print(f"   ---> 🚨 HATA BULUNDU: {aciklama}")
+                    else:
+                        durum = "TEMİZ"
+                        aciklama = "Resmi siteyle birebir uyuşmaktadır. Sorun yok."
+                        print(f"   ---> ✅ TEMİZ: Sorun yok.")
                     
                 append_to_reports(filename, esas, karar, durum, aciklama, filepath)
             else:
