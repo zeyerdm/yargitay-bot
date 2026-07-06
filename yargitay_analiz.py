@@ -186,7 +186,7 @@ def main():
                 import re
                 aranacak_kaliplar = [
                     re.compile(r"[a-zçğıöşü]{2,}[A-ZÇĞİÖŞÜ][a-zçğıöşü]{2,}"), # Genel Kural: kararıTemyiz
-                    re.compile(r"\S{60,}"),                                    # Anormal Kural: 60+ harfli devasa boşluksuz blok
+                    re.compile(r"\S{45,}"),                                    # Anormal Kural: 45+ harfli devasa boşluksuz blok
                     re.compile(r"\d{4}numaras[ıi]", re.IGNORECASE),            # 2012numarası
                     re.compile(r"mahkemesitarih[iı]", re.IGNORECASE),          # mahkemesitarihi
                     re.compile(r"karar[ıi]temyiz", re.IGNORECASE),             # kararıtemyiz
