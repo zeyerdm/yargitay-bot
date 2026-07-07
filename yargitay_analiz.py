@@ -93,14 +93,14 @@ def search_yargitay(page, esas, karar):
         time.sleep(1) # Yüklenmesi için bekle
         
         # Sonuç tablosunu ve metni bekle
-        page.wait_for_selector("table tbody tr", timeout=10000)
+        page.wait_for_selector("table tbody tr", timeout=5000)
         
         try:
             # İlk sonuca tıkla (Tablodaki ilk satıra tıkla)
-            page.locator("table tbody tr").first.click(timeout=5000)
-            time.sleep(3) # Karar metninin AJAX ile gelmesini bekle
+            page.locator("table tbody tr").first.click(timeout=3000)
+            time.sleep(2) # Karar metninin AJAX ile gelmesini bekle
             
-            page.wait_for_selector("div.card-scroll", timeout=10000)
+            page.wait_for_selector("div.card-scroll", timeout=5000)
             text = page.locator("div.card-scroll").inner_text()
             
             # Eğer metin boş geldiyse biraz daha bekle
@@ -234,9 +234,9 @@ def main():
                     
                 append_to_reports(filename, esas, karar, durum, aciklama, filepath)
             else:
-                append_to_reports(filename, esas, karar, "⚠️ UYARI", "Siteden yanıt alınamadı, zaman aşımı.", filepath)
-                print("   ---> ⚠️ UYARI: Siteden yanıt alınamadı. Kısa süreliğine duraklatılıyor...")
-                time.sleep(30) # Engel yememek için ceza beklemesi
+                append_to_reports(filename, esas, karar, "⚠️ UYARI", "Sitede bulunamadı veya zaman aşımı.", filepath)
+                print("   ---> ⚠️ UYARI: Karar sitede bulunamadı veya sayfa yüklenmedi. Geçiliyor...")
+                time.sleep(3) # 30 saniyelik gereksiz ceza uykusu 3 saniyeye düşürüldü
                 
             # İlerlemeyi kaydet (Elektrik kesilse bile kalınan yerden devam eder)
             islenenler.append(filepath)
