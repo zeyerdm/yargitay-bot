@@ -64,9 +64,16 @@ def extract_numbers(filename):
 
 def search_yargitay(page, esas, karar):
     try:
-        page.goto("https://karararama.yargitay.gov.tr/")
-        page.wait_for_load_state('networkidle')
-        
+        current_url = page.url
+        if "karararama.yargitay.gov.tr" not in current_url:
+            page.goto("https://karararama.yargitay.gov.tr/", timeout=15000)
+            try:
+                page.wait_for_load_state('networkidle', timeout=5000)
+            except:
+                pass
+        else:
+            # TURBO MOD: Sayfayı yenilemek yerine JavaScript ile eski arama sonuçlarını sil
+            page.evaluate('if(document.querySelector("table tbody")) document.querySelector("table tbody").innerHTML = "";')
         # Detaylı Arama'yı aç
         try:
             page.get_by_text("DETAYLI ARAMA").click(timeout=3000)
@@ -115,10 +122,14 @@ def search_yargitay(page, esas, karar):
             return text
         except Exception as ex:
             print(f"   ---> ⚠️ UYARI: Tablodan sonuç seçilemedi veya metin okunamadı: {ex}")
+            try: page.goto("about:blank") # Hata varsa bir sonraki turda sayfayı sıfırlamaya zorla
+            except: pass
             return None
             
     except Exception as e:
         print(f"Yargıtay araması başarısız: {e}")
+        try: page.goto("about:blank")
+        except: pass
         return None
 
 def main():
@@ -243,14 +254,14 @@ def main():
             save_islenenler(islenenler)
             islenen_sayisi += 1
             
-            # ANTI-BAN MEKANİZMASI: Hızlandırıldı (2 ile 4 sn arası)
-            bekleme = random.uniform(2.0, 4.0)
+            # ANTI-BAN MEKANİZMASI: Hızlandırıldı
+            bekleme = random.uniform(1.0, 2.5)
             time.sleep(bekleme)
             
-            # ANTI-BAN MEKANİZMASI: Her 100 dosyada bir 1 dakika mola ver (Hızlandırıldı)
+            # ANTI-BAN MEKANİZMASI: Her 100 dosyada bir mola
             if islenen_sayisi % 100 == 0:
-                print("\n[MOLA] 100 dosya işlendi. 1 dakika nefes alınıyor...\n")
-                time.sleep(60)
+                print("\n[MOLA] 100 dosya işlendi. 15 saniye nefes alınıyor...\n")
+                time.sleep(15)
                 
         browser.close()
     
