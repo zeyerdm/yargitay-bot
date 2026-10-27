@@ -3,9 +3,8 @@ import glob
 import shutil
 import re
 
-# Sisteminize (Zeynep ERDEM) özel ayarlanmış yollar
-KLASOR_YOLU = r"C:\Users\Zeynep ERDEM\Downloads\Hukuk ve Ceza Kurul Son" 
-HEDEF_KLASOR = r"C:\Users\Zeynep ERDEM\.gemini\antigravity-ide\scratch\kararlar\Sirket_Bozuk_Dosyalar"
+# Klasör yolları (bkz. config.py)
+from config import KLASOR_YOLU, BOZUK_KLASORU as HEDEF_KLASOR
 
 def bozuk_dosyalari_bul_ve_listele():
     bozuk_dosyalar = []
