@@ -1,14 +1,11 @@
 import os
 import csv
-from datetime import datetime
 from playwright.sync_api import sync_playwright
 
 # yargitay_analiz betiğinden fonksiyonları içe aktar
 from yargitay_analiz import search_yargitay, extract_numbers, KLASOR_YOLU
 
-BUGUN = datetime.now().strftime("%Y-%m-%d")
-CSV_RAPOR = rf"C:\Users\Zeynep ERDEM\.gemini\antigravity-ide\scratch\kararlar\rapor_{BUGUN}.csv"
-HATALI_CSV = rf"C:\Users\Zeynep ERDEM\.gemini\antigravity-ide\scratch\kararlar\hatali_dosyalar_{BUGUN}.csv"
+from config import CSV_RAPOR, HATALI_CSV
 
 def get_file_paths_mapping():
     mapping = {}

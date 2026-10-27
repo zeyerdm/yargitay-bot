@@ -1,11 +1,10 @@
 import os
 import csv
 
-KLASOR_YOLU = r"C:\Users\Zeynep ERDEM\Downloads\Hukuk ve Ceza Kurul Son"
-HEDEF_KLASOR = r"C:\Users\Zeynep ERDEM\Downloads\Normalize_Edilmis_Kararlar"
+# Klasör yolları (bkz. config.py)
+from config import KLASOR_YOLU, NORMALIZE_KLASORU as HEDEF_KLASOR, RAPOR_KLASORU
 
 # En güncel raporu otomatik bulalım
-RAPOR_KLASORU = r"C:\Users\Zeynep ERDEM\.gemini\antigravity-ide\scratch\kararlar"
 
 def en_guncel_raporu_bul():
     raporlar = [f for f in os.listdir(RAPOR_KLASORU) if f.startswith("rapor_") and f.endswith(".csv")]

@@ -7,7 +7,7 @@ try:
         page.get_by_text("DETAYLI ARAMA").click(timeout=3000)
         page.fill("#esasNoYil", "2003")
         page.fill("#esasNoSira1", "3003")
-        page.click("#detaylýAramaG")
+        page.click("#detaylÄ±AramaG")
         print("Search submitted")
         page.wait_for_selector("table", timeout=5000)
         print("Table loaded")

@@ -7,15 +7,8 @@ import csv
 from datetime import datetime
 from playwright.sync_api import sync_playwright
 
-# Konfigürasyon ve Yollar
-KLASOR_YOLU = r"C:\Users\Zeynep ERDEM\Downloads\Hukuk ve Ceza Kurul Son"
-ISLENENLER_DOSYASI = r"C:\Users\Zeynep ERDEM\.gemini\antigravity-ide\scratch\kararlar\islenenler.json"
-
-# Dinamik Tarihli Dosya İsimleri (Günün Raporu)
-BUGUN = datetime.now().strftime("%Y-%m-%d")
-CSV_RAPOR = rf"C:\Users\Zeynep ERDEM\.gemini\antigravity-ide\scratch\kararlar\rapor_{BUGUN}.csv"
-MD_RAPOR = rf"C:\Users\Zeynep ERDEM\.gemini\antigravity-ide\scratch\kararlar\rapor_{BUGUN}.md"
-HATALI_CSV = rf"C:\Users\Zeynep ERDEM\.gemini\antigravity-ide\scratch\kararlar\hatali_dosyalar_{BUGUN}.csv"
+# Konfigürasyon ve Yollar (bkz. config.py)
+from config import KLASOR_YOLU, ISLENENLER_DOSYASI, CSV_RAPOR, MD_RAPOR, HATALI_CSV
 
 def load_islenenler():
     if os.path.exists(ISLENENLER_DOSYASI):
